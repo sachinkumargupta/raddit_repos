@@ -1,6 +1,8 @@
 class LinksController < ApplicationController
   before_action :set_link, only: [:show, :edit, :update, :destroy]
-
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authorized_user, only: [:edit, :update, :destroy]
+  
   # GET /links
   # GET /links.json
   def index
@@ -60,6 +62,20 @@ class LinksController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def upvote
+     @link = Link.find(params[:id])
+     @link.upvote_by current_user
+     redirect_back fallback_location: root_path
+   end
+
+   def downvote
+     @link = Link.find(params[:id])
+     @link.downvote_from current_user
+     redirect_back fallback_location: root_path
+   end
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
